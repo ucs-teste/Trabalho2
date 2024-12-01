@@ -2,7 +2,7 @@ name: Main Pipeline
 
 on:
   schedule:
-    - cron: "17 20 * * *" # Agendado para 21:00 UTC
+    - cron: "26 20 * * *" # Agendado para 21:00 UTC
 
 jobs:
   deploy:
