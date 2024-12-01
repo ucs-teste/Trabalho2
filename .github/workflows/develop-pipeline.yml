@@ -1,4 +1,3 @@
-# .github/workflows/develop-pipeline.yml
 name: Develop Pipeline
 
 on:
@@ -14,18 +13,25 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Aplicar migrações no Supabase (Develop)
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_DEVELOP_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_DEVELOP_KEY }}
+      - name: Verificar variáveis de ambiente
         run: |
-          echo "Aplicando migrações no Supabase para Develop..."
-          for file in $(ls migrations/*.sql); do
-            psql $SUPABASE_URL -U postgres -f $file
-          done
+          if [ -z "${{ secrets.SUPABASE_DEVELOP_URL }}" ] || [ -z "${{ secrets.SUPABASE_PASSWORD }}" ]; then
+            echo "Erro: Variáveis de ambiente ausentes"
+            exit 1
+          fi
 
-      - name: Deploy do index.html (Develop)
+      - name: Instalar Supabase CLI
         run: |
-          echo "Realizando deploy do index.html para o ambiente Develop..."
-          # Use Netlify, GitHub Pages, ou outra ferramenta para hospedar o arquivo
-          cp index.html /path/to/develop/site
+          curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          npm install -g supabase
+
+      - name: Aplicar migrações no Supabase (Develop)
+        run: |
+          supabase db push --project-ref ${{ secrets.SUPABASE_PROJECT_REF }} --password ${{ secrets.SUPABASE_PASSWORD }}
+
+      - name: Deploy para GitHub Pages (Develop)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ # Diretório onde o `index.html` está localizado
