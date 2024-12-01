@@ -15,20 +15,28 @@ jobs:
 
       - name: Verificar variáveis de ambiente
         run: |
-          if [ -z "${{ secrets.SUPABASE_DEVELOP_URL }}" ] || [ -z "${{ secrets.SUPABASE_PASSWORD }}" ]; then
-            echo "Erro: Variáveis de ambiente ausentes"
+          if [ -z "${{ secrets.SUPABASE_DEVELOP_URL }}" ] || [ -z "${{ secrets.SUPABASE_PASSWORD }}" ] || [ -z "${{ secrets.SUPABASE_USERNAME }}" ]; then
+            echo "Erro: Variáveis de ambiente ausentes."
+            echo "Certifique-se de configurar SUPABASE_DEVELOP_URL, SUPABASE_PASSWORD e SUPABASE_USERNAME nos Secrets do GitHub."
             exit 1
           fi
 
-      - name: Instalar Supabase CLI
+      - name: Instalar PostgreSQL CLI
         run: |
-          curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-          npm install -g supabase
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
 
       - name: Aplicar migrações no Supabase (Develop)
+        env:
+          SUPABASE_DEVELOP_URL: ${{ secrets.SUPABASE_DEVELOP_URL }}
+          SUPABASE_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+          SUPABASE_USERNAME: ${{ secrets.SUPABASE_USERNAME }}
         run: |
-          supabase db push --project-ref ${{ secrets.SUPABASE_PROJECT_REF }} --password ${{ secrets.SUPABASE_PASSWORD }}
+          echo "Aplicando migrações no banco de dados Supabase (Develop)..."
+          for file in $(ls migrations/*.sql); do
+            echo "Executando $file..."
+            PGPASSWORD="${SUPABASE_PASSWORD}" psql -h ${SUPABASE_DEVELOP_URL} -U ${SUPABASE_USERNAME} -f $file
+          done
 
       - name: Deploy para GitHub Pages (Develop)
         uses: peaceiris/actions-gh-pages@v3
