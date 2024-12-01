@@ -35,7 +35,7 @@ jobs:
           echo "Aplicando migrações no banco de dados Supabase (Develop)..."
           for file in $(ls migrations/*.sql); do
             echo "Executando $file..."
-            PGPASSWORD="${SUPABASE_PASSWORD}" psql -h ${SUPABASE_DEVELOP_URL} -U ${SUPABASE_USERNAME} -f $file
+            PGPASSWORD='${SUPABASE_PASSWORD}' psql -h ${SUPABASE_DEVELOP_URL} -p 6543 -U ${SUPABASE_USERNAME} -d "postgres" -f $file
           done
 
       - name: Deploy para GitHub Pages (Develop)
