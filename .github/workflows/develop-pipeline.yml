@@ -1,26 +1,26 @@
-# .github/workflows/pipeline2.yml
-name: Deploy Pipeline
+# .github/workflows/develop-pipeline.yml
+name: Develop Pipeline
 
 on:
   push:
-    tags:
-      - 'v*' # Aciona quando tags no formato v1.0, v2.0, etc., são criadas.
+    branches:
+      - develop
 
 jobs:
-  deploy:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Configurar AWS CLI
-        uses: aws-actions/configure-aws-credentials@v3
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          node-version: 16
 
-      - name: Deploy para produção
-        run: |
-          echo "Iniciando deploy..."
-          # Comandos de deploy aqui
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Executar testes
+        run: npm test
