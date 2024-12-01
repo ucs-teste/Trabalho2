@@ -2,25 +2,30 @@
 name: Develop Pipeline
 
 on:
-  push:
+  pull_request:
     branches:
       - develop
 
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+      - name: Aplicar migrações no Supabase (Develop)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_DEVELOP_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_DEVELOP_KEY }}
+        run: |
+          echo "Aplicando migrações no Supabase para Develop..."
+          for file in $(ls migrations/*.sql); do
+            psql $SUPABASE_URL -U postgres -f $file
+          done
 
-      - name: Instalar dependências
-        run: npm install
-
-      - name: Executar testes
-        run: npm test
+      - name: Deploy do index.html (Develop)
+        run: |
+          echo "Realizando deploy do index.html para o ambiente Develop..."
+          # Use Netlify, GitHub Pages, ou outra ferramenta para hospedar o arquivo
+          cp index.html /path/to/develop/site
