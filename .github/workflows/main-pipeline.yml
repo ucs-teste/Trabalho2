@@ -1,8 +1,9 @@
 name: Main Pipeline
 
 on:
-  schedule:
-    - cron: "30 20 * * *" # Agendado para 21:00 UTC
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
