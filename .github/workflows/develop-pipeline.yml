@@ -39,8 +39,3 @@ jobs:
             PGPASSWORD=${SUPABASE_PASSWORD} psql -h ${SUPABASE_DEVELOP_URL} -p 6543 -U ${SUPABASE_USERNAME} -d "postgres" -f $file
           done
 
-      - name: Deploy para GitHub Pages (Develop)
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./ # Diretório onde o `index.html` está localizado
