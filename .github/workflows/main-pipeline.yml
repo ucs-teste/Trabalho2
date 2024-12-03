@@ -36,10 +36,3 @@ jobs:
             echo "Executando $file..."
             PGPASSWORD=${SUPABASE_PASSWORD} psql -h ${SUPABASE_URL} -p 6543 -U postgres.mencmqtmgbknekwavnld -d postgres -f $file
           done
-
-      - name: Deploy para GitHub Pages (Main)
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: main  # Define o branch para `main`
-          publish_dir: ./  # Diretório onde o `index.html` está localizado
